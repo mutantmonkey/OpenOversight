@@ -14,6 +14,8 @@
     {% else %}
       {% set officer_image = officer.face.first().image.filepath %}
     {% endif %}
+    {{ comp_get = requests.get("http://staging.cpdp.co/api/v1/suggestion/?"+assignment.star_no}}
+    {{ comp_url = comp_get.json()['payload']['url'] }}
     {% set assignment = officer.assignments.first() %}
       <div class="col-md-4 col-sm-4 col-xs-12">
         <div class="thumbnail_container">
@@ -28,6 +30,10 @@
                            officer_star=assignment.star_no,
                            officer_image=officer_image) }}">
           <button type="button" class="btn btn-info btn-sm">That's the officer!</button></a></center>
+        </div>
+        <div class="thumbnail_container">
+                      <center><a href="{{comp_url }}">
+          <button type="button" class="btn btn-info btn-sm">View Complaint History</button></a></center>
         </div>
       </div>
   {% endfor %}
