@@ -2,9 +2,10 @@ import os
 from flask import (render_template, request, redirect, url_for,
                    send_from_directory, flash, session, current_app)
 from werkzeug import secure_filename
+
 from . import main
-from ..utils import allowed_file, grab_officers, roster_lookup
-from .forms import FindOfficerForm, FindOfficerIDForm
+from ..utils import allowed_file, grab_officers, roster_lookup, upload_file
+from .forms import FindOfficerForm, FindOfficerIDForm, HumintContribution
 
 
 @main.route('/')
@@ -73,24 +74,11 @@ def submit_complaint():
 
 @main.route('/submit')
 def submit_data():
-    return render_template('submit.html')
-
-
-@main.route('/upload', methods=['POST'])
-def upload_file():
-    file = request.files['file']
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(current_app.config['UNLABELLED_UPLOADS'], filename))
-        return redirect(url_for('main.show_upload',
-                                filename=filename))
-
-
-@main.route('/show_upload/<filename>')
-def show_upload(filename):
-    # return send_from_directory('../'+config.UNLABELLED_UPLOADS,
-    #                           filename)
-    return 'Successfully uploaded: {}'.format(filename)
+    form = HumintContribution()
+    if form.validate_on_submit():
+        upload_file()  # No arg needed because it is stored in the request
+        flash('File successfully uploaded!')
+    return render_template('submit.html', form=form)
 
 
 @main.route('/about')
